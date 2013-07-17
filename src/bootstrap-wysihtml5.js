@@ -66,6 +66,9 @@
 
         "image": function(locale, options) {
             var size = (options && options.size) ? ' btn-'+options.size : '';
+            var fileUploader = options.fileUpload ?
+                "<input name='file' class='file-uploader' type='file' multiple><p class='uploaded'>" : "";
+
             return "<li>" +
               "<div class='bootstrap-wysihtml5-insert-image-modal modal hide fade'>" +
                 "<div class='modal-header'>" +
@@ -74,6 +77,8 @@
                 "</div>" +
                 "<div class='modal-body'>" +
                   "<input value='http://' class='bootstrap-wysihtml5-insert-image-url input-xlarge'>" +
+                  "<br />" +
+                  fileUploader +
                 "</div>" +
                 "<div class='modal-footer'>" +
                   "<a href='#' class='btn' data-dismiss='modal'>" + locale.image.cancel + "</a>" +
@@ -147,7 +152,7 @@
 
         createEditor: function(options) {
             options = options || {};
-            
+
             // Add the toolbar to a clone of the options object so multiple instances
             // of the WYISYWG don't break because "toolbar" is already defined
             options = $.extend(true, {}, options);
@@ -170,6 +175,7 @@
                 'style': "display:none"
             });
             var culture = options.locale || defaultOptions.locale || "en";
+            var fileUploadOpts = options.fileUpload;
             for(var key in defaultOptions) {
                 var value = false;
 
@@ -193,7 +199,7 @@
                     }
 
                     if(key === "image") {
-                        this.initInsertImage(toolbar);
+                        this.initInsertImage(toolbar, fileUploadOpts);
                     }
                 }
             }
@@ -228,23 +234,22 @@
             });
         },
 
-        initInsertImage: function(toolbar) {
+        initInsertImage: function(toolbar, fileUploadOpts) {
             var self = this;
             var insertImageModal = toolbar.find('.bootstrap-wysihtml5-insert-image-modal');
             var urlInput = insertImageModal.find('.bootstrap-wysihtml5-insert-image-url');
             var insertButton = insertImageModal.find('a.btn-primary');
             var initialValue = urlInput.val();
             var caretBookmark;
+            var imagesToBeInserted = [];
 
-            var insertImage = function() {
-                var url = urlInput.val();
-                urlInput.val(initialValue);
+            var insertImage = function(image) {
                 self.editor.currentView.element.focus();
                 if (caretBookmark) {
                   self.editor.composer.selection.setBookmark(caretBookmark);
                   caretBookmark = null;
                 }
-                self.editor.composer.commands.exec("insertImage", url);
+                self.editor.composer.commands.exec("insertImage", image);
             };
 
             urlInput.keypress(function(e) {
@@ -254,7 +259,20 @@
                 }
             });
 
-            insertButton.click(insertImage);
+            insertButton.click(function() {
+                var url = urlInput.val();
+
+                urlInput.val(initialValue);
+                imagesToBeInserted.push({
+                    src: url
+                });
+
+                $.each(imagesToBeInserted, function(index, image) {
+                    insertImage(image);
+                });
+
+                imagesToBeInserted = [];
+            });
 
             insertImageModal.on('shown', function() {
                 urlInput.focus();
@@ -263,6 +281,29 @@
             insertImageModal.on('hide', function() {
                 self.editor.currentView.element.focus();
             });
+
+            if (fileUploadOpts) {
+                insertImageModal.find('.file-uploader').fileupload($.extend({}, fileUploadOpts, {
+                    done: function(e, data) {
+                        // Trigger the custom file upload callback that should return an
+                        // an object or an array of objects with the following format:
+                        // {
+                        //   src: 'image url',  // Note that this should be a full url.
+                        //   alt: 'image alt'   // Optional.
+                        // }
+                        var images = fileUploadOpts.done(e, data);
+                        var uploaded = insertImageModal.find('.uploaded');
+
+                        if (!$.isArray(images)) images = [images];
+                        imagesToBeInserted = imagesToBeInserted.concat(images);
+
+                        $.each(images, function(index, image) {
+                            image = document.createTextNode(image.alt || image.src);
+                            uploaded.append("<br />").append(image);
+                        });
+                    }
+                }));
+            }
 
             toolbar.find('a[data-wysihtml5-command=insertImage]').click(function() {
                 var activeButton = $(this).hasClass("wysihtml5-command-active");
@@ -379,7 +420,7 @@
             return methods.init.apply( this, arguments );
         } else {
             $.error( 'Method ' +  method + ' does not exist on jQuery.wysihtml5' );
-        }    
+        }
     };
 
     $.fn.wysihtml5.Constructor = Wysihtml5;
@@ -487,7 +528,7 @@
             },
             image: {
                 insert: "Insert image",
-                cancel: "Cancel"
+                cancel: "Cancel",
             },
             html: {
                 edit: "Edit HTML"
