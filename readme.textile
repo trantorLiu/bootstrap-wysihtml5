@@ -172,6 +172,49 @@ $(this).wysihtml5('resetDefaults')
 
 Operations on the defaults are not thread-safe; if you're going to change the defaults, you probably want to do it only once, after you load the bootstrap-wysihtml plugin and before you start instantiating your editors.
 
+h2. Image Upload
+
+To turn on the image upload support, you need to reference "jQuery-File-Upload":https://github.com/blueimp/jQuery-File-Upload and its dependencies:
+
+<pre>
+<script src="lib/js/jquery.ui.widget.js"></script>
+<script src="lib/js/jquery.iframe-transport.js"></script>
+<script src="lib/js/jquery.fileupload.js"></script>
+</pre>
+
+Then, if @options.fileUpload@ is given, there will be an additional file input field in the insert image modal.
+
+<pre>
+$('#some-textarea').wysihtml5({
+  // options passed to jQuery-File-Upload.
+  fileUpload: {
+    url: 'http://localhost:8888',
+    dataType: 'json',
+    done: function(e, data) {
+      var images = [];
+      $.each(data.result.files, function(index, file) {
+        images.push({
+          src: file.url,
+          alt: file.name
+        });
+      });
+      return images;
+    }
+  }
+});
+</pre>
+
+The @done@ callback should return an object or an array of objects with the following format:
+
+<pre>
+{
+  src: 'http://example.com/path/to/the/image',
+  alt: 'img alt'    // optional
+}
+</pre>
+
+Note that **@src@ must be a full absolute url**.
+
 h2. The underlying wysihtml5 object
 
 You can access the "wysihtml5 editor object":https://github.com/xing/wysihtml5 like this:
@@ -180,7 +223,6 @@ You can access the "wysihtml5 editor object":https://github.com/xing/wysihtml5 l
 var wysihtml5Editor = $('#some-textarea').data("wysihtml5").editor;
 wysihtml5Editor.composer.commands.exec("bold");
 </pre>
-
 
 h2. I18n
 
