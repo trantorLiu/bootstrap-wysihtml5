@@ -272,6 +272,7 @@
                 });
 
                 imagesToBeInserted = [];
+                insertImageModal.find('.uploaded').text('');
             });
 
             insertImageModal.on('shown', function() {
