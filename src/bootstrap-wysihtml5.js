@@ -67,7 +67,7 @@
         "image": function(locale, options) {
             var size = (options && options.size) ? ' btn-'+options.size : '';
             var fileUploader = options.fileUpload ?
-                "<input name='file' class='file-uploader' type='file' multiple><p class='uploaded'>" : "";
+                "<input name='file' class='file-uploader' type='file' multiple><br />" + locale.image.usage + "<p class='uploaded'>" : "";
 
             return "<li>" +
               "<div class='bootstrap-wysihtml5-insert-image-modal modal hide fade'>" +
@@ -301,7 +301,8 @@
                             image = document.createTextNode(image.alt || image.src);
                             uploaded.append("<br />").append(image);
                         });
-                    }
+                    },
+                    dropzone: insertImageModal
                 }));
             }
 
@@ -529,6 +530,7 @@
             image: {
                 insert: "Insert image",
                 cancel: "Cancel",
+                usage: "Enter URL, drag & drop here, or select from your computer"
             },
             html: {
                 edit: "Edit HTML"
