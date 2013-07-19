@@ -26,7 +26,8 @@
         },
         image: {
             insert: "插入圖片連結",
-            cancel: "取消"
+            cancel: "取消",
+            usage: "輸入圖片連結、將圖片拖曳到此、或上傳圖片"
         },
         html: {
             edit: "HTML原始碼"

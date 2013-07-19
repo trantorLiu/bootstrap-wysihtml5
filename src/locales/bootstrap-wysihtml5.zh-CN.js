@@ -26,7 +26,8 @@
         },
         image: {
             insert: "插入图片",
-            cancel: "取消"
+            cancel: "取消",
+            usage: "输入图片连结、将图片拖曳到此或上传图片"
         },
         html: {
             edit: "HTML代码"
