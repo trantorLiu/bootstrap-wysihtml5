@@ -11,7 +11,7 @@
         },
         emphasis: {
             bold: "Удебелен",
-            italic: "Курсив",
+            italic: "Наклонен",
             underline: "Подчертан"
         },
         lists: {
@@ -29,15 +29,15 @@
             cancel: "Отмени"
         },
         html: {
-            edit: "Редакртирай HTML"
+            edit: "Редактирай HTML"
         },
         colours: {
             black: "Черен",
             silver: "Сребърен",
             gray: "Сив",
-            maroon: "Коричневый",
+            maroon: "Кестеняв",
             red: "Червен",
-            purple: "Виолетов",
+            purple: "Лилав",
             green: "Зелен",
             olive: "Маслинен",
             navy: "Морско син",
